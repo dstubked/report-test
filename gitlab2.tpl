@@ -46,7 +46,6 @@
       "id": "{{ .VulnerabilityID }}",
       "name": {{ .Title | printf "%q" }},
       "description": {{ .Description | printf "%q" }},
-      "file": "N/A",
       "severity": {{ if eq .Severity "UNKNOWN" -}}
                     "Unknown"
                   {{- else if eq .Severity "LOW" -}}
@@ -66,6 +65,7 @@
                     "No solution provided"
                   {{- end }},
       "location": {
+        "file": "N/A",
         "dependency": {
           "package": {
             "name": "{{ .PkgName }}"
