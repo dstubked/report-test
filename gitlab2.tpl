@@ -33,32 +33,6 @@
         {{- $os = $target | splitList "(" | last | trimSuffix ")" }}
     {{- end }}
   {{- end }}
-  "dependency_files": [
-  {
-    "path": "package.json",
-    "type": "npm"
-  },
-  {
-    "path": "package-lock.json",
-    "type": "npm"
-  },
-  {
-    "path": "requirements.txt",
-    "type": "pip"
-  },
-  {
-    "path": "Gemfile.lock",
-    "type": "rubygems"
-  },
-  {
-    "path": "pom.xml",
-    "type": "maven"
-  },
-  {
-    "path": "composer.json",
-    "type": "composer"
-  }
-],
   "vulnerabilities": [
   {{- $t_first := true }}
   {{- range . }}
