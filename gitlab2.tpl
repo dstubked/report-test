@@ -46,6 +46,7 @@
       "id": "{{ .VulnerabilityID }}",
       "name": {{ .Title | printf "%q" }},
       "description": {{ .Description | printf "%q" }},
+      "file": "N/A",
       "severity": {{ if eq .Severity "UNKNOWN" -}}
                     "Unknown"
                   {{- else if eq .Severity "LOW" -}}
