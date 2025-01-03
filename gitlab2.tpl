@@ -33,6 +33,7 @@
         {{- $os = $target | splitList "(" | last | trimSuffix ")" }}
     {{- end }}
   {{- end }}
+  "dependency_files": [],
   "vulnerabilities": [
   {{- $t_first := true }}
   {{- range . }}
