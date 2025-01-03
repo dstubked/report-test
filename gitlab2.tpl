@@ -58,7 +58,7 @@
     "path": "composer.json",
     "type": "composer"
   }
-]
+],
   "vulnerabilities": [
   {{- $t_first := true }}
   {{- range . }}
