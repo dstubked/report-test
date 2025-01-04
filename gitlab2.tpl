@@ -37,6 +37,7 @@
   "vulnerabilities": [
   {{- $t_first := true }}
   {{- range . }}
+    {{- $target := .Target }}
     {{- range .Vulnerabilities -}}
     {{- if $t_first -}}
       {{- $t_first = false -}}
@@ -66,7 +67,7 @@
                     "No solution provided"
                   {{- end }},
       "location": {
-        "file": "{{ .Target }}",
+        "file": "{{ $target }}",
         "dependency": {
           "package": {
             "name": "{{ .PkgName }}"
