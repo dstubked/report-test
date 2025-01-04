@@ -38,6 +38,7 @@
   {{- $t_first := true }}
   {{- range . }}
     {{- $target := .Target }}
+    {{- $type := .Type }}
     {{- range .Vulnerabilities -}}
     {{- if $t_first -}}
       {{- $t_first = false -}}
@@ -68,6 +69,7 @@
                   {{- end }},
       "location": {
         "file": "{{ $target }}",
+        "type": "{{ $type }}",
         "dependency": {
           "package": {
             "name": "{{ .PkgName }}"
