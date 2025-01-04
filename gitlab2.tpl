@@ -66,8 +66,7 @@
                     "No solution provided"
                   {{- end }},
       "location": {
-        "file": {{ if .FilePath }} "{{ .FilePath }}" {{ else }} "unknown" 
-      {{ end }},
+        "file": {{ if .FilePath }} "{{ .FilePath }}" {{ else }} "unknown",
         "dependency": {
           "package": {
             "name": "{{ .PkgName }}"
