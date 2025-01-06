@@ -35,9 +35,12 @@
         {{- end }}
         {
           "id": "{{ .CheckID }}",
+          "category": "sast",
           "name": {{ .Title | printf "%q" }},
+          "message": {{ .Message | printf "%q" }},
           "description": {{ .Message | printf "%q" }},
-          "severity": {{ .Severity | printf "%q" }},
+          "severity": {{ .Severity | printf "%q" | lower }},
+          "confidence": {{ .Confidence | printf "%q" | lower }},
           "solution": {{ if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
             "file": {{ $target | printf "%q" }},
@@ -48,7 +51,8 @@
             {
               "type": "cwe",
               "name": "CWE-{{ index .CWE 0 }}",
-              "value": "{{ index .CWE 0 }}"
+              "value": "{{ index .CWE 0 }}",
+              "url": "https://cwe.mitre.org/data/definitions/{{ index .CWE 0 }}.html"
             }
           ],
           "scanner": {
