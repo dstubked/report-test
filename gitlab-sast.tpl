@@ -7,7 +7,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ .Version }}"
+      "version": "{{ appVersion }}"
     },
     "end_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "scanner": {
@@ -17,7 +17,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ .Version }}"
+      "version": "{{ appVersion }}"
     },
     "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "status": "success",
