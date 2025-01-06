@@ -30,59 +30,42 @@
       {{- range .Sast }}
         {{- if $t_first }}
           {{- $t_first = false }}
-        {{- else }}
+        {{- else -}}
           ,
         {{- end }}
         {
           "id": "{{ .CheckID }}",
           "name": {{ .Title | printf "%q" }},
           "description": {{ .Message | printf "%q" }},
-          "severity": "{{ .Severity }}",
+          "severity": {{ .Severity | printf "%q" }},
           "solution": {{ if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
-            "file": "{{ $target }}",
+            "file": {{ $target | printf "%q" }},
             "start_line": {{ .StartLine }},
             "end_line": {{ .EndLine }}
           },
-          "cwe": [
-            {{- $cwe_first := true }}
-            {{- range .CWE }}
-              {{- if $cwe_first }}
-                {{- $cwe_first = false }}
-              {{- else }}
-                ,
-              {{- end }}
-              "{{ . }}"
-            {{- end }}
+          "identifiers": [
+            {
+              "type": "cwe",
+              "name": "CWE-{{ index .CWE 0 }}",
+              "value": "{{ index .CWE 0 }}"
+            }
           ],
-          "owasp_top_10": [
-            {{- $owasp_first := true }}
-            {{- range .OWASP }}
-              {{- if $owasp_first }}
-                {{- $owasp_first = false }}
-              {{- else }}
-                ,
-              {{- end }}
-              "{{ . }}"
-            {{- end }}
-          ],
-          "confidence": "{{ .Confidence }}",
-          "likelihood": "{{ .Likelihood }}",
-          "impact": "{{ .Impact }}",
-          "references": [
+          "scanner": {
+            "id": "trivy",
+            "name": "Trivy"
+          },
+          "links": [
             {{- $ref_first := true }}
             {{- range .References }}
-              {{- if $ref_first }}
-                {{- $ref_first = false }}
-              {{- else }}
-                ,
-              {{- end }}
-              "{{ . }}"
+              {{- if $ref_first }}{{ $ref_first = false }}{{ else }},{{ end }}
+              {
+                "url": {{ . | printf "%q" }}
+              }
             {{- end }}
           ]
         }
       {{- end }}
     {{- end }}
-  ],
-  "remediations": []
+  ]
 }
