@@ -7,7 +7,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ appVersion }}"
+      "version": "{{ .Version }}"
     },
     "end_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "scanner": {
@@ -17,7 +17,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ appVersion }}"
+      "version": "{{ .Version }}"
     },
     "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "status": "success",
@@ -25,45 +25,59 @@
   },
   "vulnerabilities": [
     {{- $t_first := true }}
-    {{- range . }}  // Iterate over Results
-      {{- $target := .Target }}  // Access Target from the current result
-      {{- range .Sast -}}  // Now iterate over SAST findings within this result
-        {{- if $t_first -}}
-          {{- $t_first = false -}}
-        {{ else -}}
+    {{- range . }}
+      {{- $target := .Target }}
+      {{- range .Sast }}
+        {{- if $t_first }}
+          {{- $t_first = false }}
+        {{- else }}
           ,
         {{- end }}
         {
-          "id": "{{ .CheckID }}",  // Unique identifier for the check
-          "name": {{ .Title | printf "%q" }},  // Title of the finding
-          "description": {{ .Message | printf "%q" }},  // Description of the finding
-          "severity": "{{ .Severity }}",  // Severity level
-          "solution": {{ if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},  // Suggested fix
+          "id": "{{ .CheckID }}",
+          "name": {{ .Title | printf "%q" }},
+          "description": {{ .Message | printf "%q" }},
+          "severity": "{{ .Severity }}",
+          "solution": {{ if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
-            "file": "{{ $target }}",  // Path to the file where the issue was found
-            "start_line": {{ .StartLine }},  // Start line of the issue
-            "end_line": {{ .EndLine }}  // End line of the issue
+            "file": "{{ $target }}",
+            "start_line": {{ .StartLine }},
+            "end_line": {{ .EndLine }}
           },
           "cwe": [
+            {{- $cwe_first := true }}
             {{- range .CWE }}
+              {{- if $cwe_first }}
+                {{- $cwe_first = false }}
+              {{- else }}
+                ,
+              {{- end }}
               "{{ . }}"
-              {{- if not @last }},{{ end }}  // Add comma if not last element
             {{- end }}
           ],
           "owasp_top_10": [
+            {{- $owasp_first := true }}
             {{- range .OWASP }}
+              {{- if $owasp_first }}
+                {{- $owasp_first = false }}
+              {{- else }}
+                ,
+              {{- end }}
               "{{ . }}"
-              {{- if not @last }},{{ end }}  // Add comma if not last element
             {{- end }}
           ],
-          // Additional fields as necessary
-          "confidence": "{{ .Confidence }}",  // Confidence level of the finding
-          "likelihood": "{{ .Likelihood }}",  // Likelihood of occurrence
-          "impact": "{{ .Impact }}",  // Impact description
+          "confidence": "{{ .Confidence }}",
+          "likelihood": "{{ .Likelihood }}",
+          "impact": "{{ .Impact }}",
           "references": [
+            {{- $ref_first := true }}
             {{- range .References }}
+              {{- if $ref_first }}
+                {{- $ref_first = false }}
+              {{- else }}
+                ,
+              {{- end }}
               "{{ . }}"
-              {{- if not @last }},{{ end }}  // Add comma if not last element
             {{- end }}
           ]
         }
