@@ -19,7 +19,7 @@
       },
       "version": "{{ appVersion }}"
     },
-    "start_time": "{{ now | date '2006-01-02T15:04:05' }}",
+    "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "status": "success",
     "type": "sast"
   },
