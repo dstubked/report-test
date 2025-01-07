@@ -25,7 +25,7 @@
   },
   "vulnerabilities": [
     {{- $t_first := true }}
-    {{- range .Results }}
+    {{- range . }}
       {{- $target := .Target }}
       {{- range .Sast }}
         {{- if $t_first }}
