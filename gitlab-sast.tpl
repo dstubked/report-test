@@ -7,7 +7,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ appVersion }}"
+      "version": "{{ .Version }}"
     },
     "end_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "scanner": {
@@ -17,7 +17,7 @@
       "vendor": {
         "name": "Aqua Security"
       },
-      "version": "{{ appVersion }}"
+      "version": "{{ .Version }}"
     },
     "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
     "status": "success",
@@ -25,7 +25,7 @@
   },
   "vulnerabilities": [
     {{- $t_first := true }}
-    {{- range . }}
+    {{- range .Results }}
       {{- $target := .Target }}
       {{- range .Sast }}
         {{- if $t_first }}
@@ -41,19 +41,27 @@
           "description": {{ .Message | printf "%q" }},
           "severity": {{ .Severity | printf "%q" | lower }},
           "confidence": {{ .Confidence | printf "%q" | lower }},
-          "solution": {{ if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
+          "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
             "file": {{ $target | printf "%q" }},
             "start_line": {{ .StartLine }},
             "end_line": {{ .EndLine }}
           },
           "identifiers": [
-            {
-              "type": "cwe",
-              "name": "CWE-{{ index .CWE 0 }}",
-              "value": "{{ index .CWE 0 }}",
-              "url": "https://cwe.mitre.org/data/definitions/{{ index .CWE 0 }}.html"
-            }
+            {{- $cwe_first := true }}
+            {{- range .CWE }}
+              {{- if $cwe_first }}
+                {{- $cwe_first = false }}
+              {{- else -}}
+                ,
+              {{- end }}
+              {
+                "type": "cwe",
+                "name": "CWE-{{ . }}",
+                "value": "{{ . }}",
+                "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
+              }
+            {{- end }}
           ],
           "scanner": {
             "id": "trivy",
@@ -62,7 +70,11 @@
           "links": [
             {{- $ref_first := true }}
             {{- range .References }}
-              {{- if $ref_first }}{{ $ref_first = false }}{{ else }},{{ end }}
+              {{- if $ref_first }}
+                {{- $ref_first = false }}
+              {{- else -}}
+                ,
+              {{- end }}
               {
                 "url": {{ . | printf "%q" }}
               }
