@@ -1,5 +1,5 @@
 {
-  "version": "15.0.7",
+  "version": "{{ appVersion }}",
   "scan": {
     "analyzer": {
       "id": "trivy",
@@ -9,7 +9,7 @@
       },
       "version": "{{ appVersion }}"
     },
-    "end_time": "{{ now | date "2006-01-02T15:04:05" }}",
+    "end_time": "{{ now | date '2006-01-02T15:04:05' }}",
     "scanner": {
       "id": "trivy",
       "name": "Trivy",
@@ -19,15 +19,15 @@
       },
       "version": "{{ appVersion }}"
     },
-    "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
+    "start_time": "{{ now | date '2006-01-02T15:04:05' }}",
     "status": "success",
     "type": "sast"
   },
   "vulnerabilities": [
     {{- $t_first := true }}
     {{- range . }}
-      {{- $target := .Target }}
-      {{- range .Sast }}
+      {{- $target := .Target }}  // Accessing Target from each result
+      {{- range .Sast }}  // Accessing SAST findings within each result
         {{- if $t_first }}
           {{- $t_first = false }}
         {{- else -}}
@@ -35,7 +35,7 @@
         {{- end }}
         {
           "id": "{{ .CheckID }}",
-          "category": "sast",
+          "category": "{{ .Category }}",  // Assuming Category is part of SAST findings
           "name": {{ .Title | printf "%q" }},
           "message": {{ .Message | printf "%q" }},
           "description": {{ .Message | printf "%q" }},
@@ -43,24 +43,18 @@
           "confidence": {{ .Confidence | printf "%q" | lower }},
           "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
-            "file": {{ $target | printf "%q" }},
+            "file": {{ $target | printf "%q" }},  // Using Target here
             "start_line": {{ .StartLine }},
             "end_line": {{ .EndLine }}
           },
           "identifiers": [
-            {{- $cwe_first := true }}
             {{- range .CWE }}
-              {{- if $cwe_first }}
-                {{- $cwe_first = false }}
-              {{- else -}}
-                ,
-              {{- end }}
               {
                 "type": "cwe",
-                "name": "CWE-{{ . }}",
+                "name": "{{ . }}",
                 "value": "{{ . }}",
                 "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
-              }
+              }{{ if not @last }},{{ end }}
             {{- end }}
           ],
           "scanner": {
@@ -68,16 +62,10 @@
             "name": "Trivy"
           },
           "links": [
-            {{- $ref_first := true }}
             {{- range .References }}
-              {{- if $ref_first }}
-                {{- $ref_first = false }}
-              {{- else -}}
-                ,
-              {{- end }}
               {
                 "url": {{ . | printf "%q" }}
-              }
+              }{{ if not @last }},{{ end }}
             {{- end }}
           ]
         }
