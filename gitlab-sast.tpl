@@ -25,13 +25,13 @@
   },
   "vulnerabilities": [
     {{- $first := true }}
-    {{- range .Results }}  // Iterate over each result
-      {{- if .Sast }}  // Check if there are SAST findings
-        {{- range .Sast }}  // Iterate over SAST findings within each result
+    {{- range .Results }}
+      {{- if .Sast }}
+        {{- range .Sast }}
           {{ if not $first }}{{ "," }}{{ end }}
           {
             "id": "{{ .CheckID }}",
-            "category": "{{ .Category }}",  // Assuming Category is part of SAST findings
+            "category": "{{ .Category }}",
             "name": {{ .Title | printf "%q" }},
             "message": {{ .Message | printf "%q" }},
             "description": {{ .Message | printf "%q" }},
@@ -39,7 +39,7 @@
             "confidence": {{ .Confidence | printf "%q" | lower }},
             "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
             "location": {
-              "file": "{{ $.Target }}",  // Using Target from the outer context
+              "file": "{{ $.Target }}",
               "start_line": {{ .StartLine }},
               "end_line": {{ .EndLine }}
             },
@@ -65,7 +65,7 @@
               {{- end }}
             ]
           }
-          {{ $first = false }}  // Set first to false after first iteration
+          {{ $first = false }}
         {{- end }}
       {{- end }}
     {{- end }}
