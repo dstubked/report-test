@@ -9,7 +9,7 @@
       },
       "version": "{{ appVersion }}"
     },
-    "end_time": "{{ now | date "2006-01-02T15:04:05" }}",  // Correctly escaped quotes
+    "end_time": "{{ now | date \"2006-01-02T15:04:05\" }}",  // Correctly escaped quotes
     "scanner": {
       "id": "trivy",
       "name": "Trivy",
@@ -19,16 +19,16 @@
       },
       "version": "{{ appVersion }}"
     },
-    "start_time": "{{ now | date "2006-01-02T15:04:05" }}",  // Correctly escaped quotes
+    "start_time": "{{ now | date \"2006-01-02T15:04:05\" }}",  // Correctly escaped quotes
     "status": "success",
     "type": "sast"
   },
   "vulnerabilities": [
-    {{- $t_first := true }}
-    {{- range . }}
-      {{- $target := .Target }}  // Accessing Target from each result
-      {{- range .Sast }}  // Accessing SAST findings within each result
-        {{ if not $t_first }}{{ "," }}{{ end }}
+    {{- $first := true }}
+    {{- range .Results }}  // Iterate over each result
+      {{- $target := .Target }}  // Store the target for use in location
+      {{- range .Sast }}  // Iterate over SAST findings within each result
+        {{ if not $first }}{{ "," }}{{ end }}
         {
           "id": "{{ .CheckID }}",
           "category": "{{ .Category }}",  // Assuming Category is part of SAST findings
@@ -39,21 +39,18 @@
           "confidence": {{ .Confidence | printf "%q" | lower }},
           "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
           "location": {
-            "file": {{ $target | printf "%q" }},  // Using Target here
+            "file": {{ $target | printf "%q" }},  // Using Target from the outer context
             "start_line": {{ .StartLine }},
             "end_line": {{ .EndLine }}
           },
           "identifiers": [
-            {{- $cwe_first := true }}
             {{- range .CWE }}
-              {{ if not $cwe_first }},{{ end }}
               {
                 "type": "cwe",
                 "name": "{{ . }}",
                 "value": "{{ . }}",
                 "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
-              }
-              {{- $cwe_first = false }}
+              }{{ if not (eq (add (index $.CWE) 1) (len $.CWE)) }},{{ end }}
             {{- end }}
           ],
           "scanner": {
@@ -61,16 +58,14 @@
             "name": "Trivy"
           },
           "links": [
-            {{- $ref_first := true }}
             {{- range .References }}
-              {{ if not $ref_first }},{{ end }}
               {
                 "url": {{ . | printf "%q" }}
-              }
-              {{- $ref_first = false }}
+              }{{ if not (eq (add (index $.References) 1) (len $.References)) }},{{ end }}
             {{- end }}
           ]
         }
+        {{ $first = false }}  // Set first to false after first iteration
       {{- end }}
     {{- end }}
   ]
