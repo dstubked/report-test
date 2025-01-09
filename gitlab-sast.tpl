@@ -25,8 +25,13 @@
   },
   "vulnerabilities": [
     {{- $first := true }}
-    {{- range .Sast }}  
-      {{ if not $first }}{{ "," }}{{ end }}
+    {{- range . }}
+      {{- range .Sast -}}
+      {{- if $first -}}
+        {{- $first = false -}}
+      {{ else -}}
+      ,
+      {{- end }} 
       {
         "id": "{{ .CheckID }}",
         "category": "{{ .Category }}",
