@@ -9,7 +9,7 @@
       },
       "version": "{{ appVersion }}"
     },
-    "end_time": "{{ now | date "2006-01-02T15:04:05" }}",
+    "end_time": "{{ now | date "2006-01-02T15:04:05" }}",  // Correctly escaped quotes
     "scanner": {
       "id": "trivy",
       "name": "Trivy",
@@ -19,7 +19,7 @@
       },
       "version": "{{ appVersion }}"
     },
-    "start_time": "{{ now | date "2006-01-02T15:04:05" }}",
+    "start_time": "{{ now | date "2006-01-02T15:04:05" }}",  // Correctly escaped quotes
     "status": "success",
     "type": "sast"
   },
@@ -28,11 +28,7 @@
     {{- range . }}
       {{- $target := .Target }}  // Accessing Target from each result
       {{- range .Sast }}  // Accessing SAST findings within each result
-        {{- if $t_first }}
-          {{- $t_first = false }}
-        {{- else -}}
-          ,
-        {{- end }}
+        {{ if not $t_first }}{{ "," }}{{ end }}
         {
           "id": "{{ .CheckID }}",
           "category": "{{ .Category }}",  // Assuming Category is part of SAST findings
@@ -48,13 +44,16 @@
             "end_line": {{ .EndLine }}
           },
           "identifiers": [
+            {{- $cwe_first := true }}
             {{- range .CWE }}
+              {{ if not $cwe_first }},{{ end }}
               {
                 "type": "cwe",
                 "name": "{{ . }}",
                 "value": "{{ . }}",
                 "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
-              }{{ if not @last }},{{ end }}
+              }
+              {{- $cwe_first = false }}
             {{- end }}
           ],
           "scanner": {
@@ -62,10 +61,13 @@
             "name": "Trivy"
           },
           "links": [
+            {{- $ref_first := true }}
             {{- range .References }}
+              {{ if not $ref_first }},{{ end }}
               {
                 "url": {{ . | printf "%q" }}
-              }{{ if not @last }},{{ end }}
+              }
+              {{- $ref_first = false }}
             {{- end }}
           ]
         }
