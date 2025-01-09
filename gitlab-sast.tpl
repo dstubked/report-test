@@ -25,49 +25,45 @@
   },
   "vulnerabilities": [
     {{- $first := true }}
-    {{- range .Results }}
-      {{- if .Sast }}
-        {{- range .Sast }}
-          {{ if not $first }}{{ "," }}{{ end }}
-          {
-            "id": "{{ .CheckID }}",
-            "category": "{{ .Category }}",
-            "name": {{ .Title | printf "%q" }},
-            "message": {{ .Message | printf "%q" }},
-            "description": {{ .Message | printf "%q" }},
-            "severity": {{ .Severity | printf "%q" | lower }},
-            "confidence": {{ .Confidence | printf "%q" | lower }},
-            "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
-            "location": {
-              "file": "{{ $.Target }}",
-              "start_line": {{ .StartLine }},
-              "end_line": {{ .EndLine }}
-            },
-            "identifiers": [
-              {{- range .CWE }}
-                {
-                  "type": "cwe",
-                  "name": "{{ . }}",
-                  "value": "{{ . }}",
-                  "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
-                }{{ if not (eq (add (index $.CWE) 1) (len $.CWE)) }},{{ end }}
-              {{- end }}
-            ],
-            "scanner": {
-              "id": "trivy",
-              "name": "Trivy"
-            },
-            "links": [
-              {{- range .References }}
-                {
-                  "url": {{ . | printf "%q" }}
-                }{{ if not (eq (add (index $.References) 1) (len $.References)) }},{{ end }}
-              {{- end }}
-            ]
-          }
-          {{ $first = false }}
-        {{- end }}
-      {{- end }}
+    {{- range .Sast }}  
+      {{ if not $first }}{{ "," }}{{ end }}
+      {
+        "id": "{{ .CheckID }}",
+        "category": "{{ .Category }}",
+        "name": {{ .Title | printf "%q" }},
+        "message": {{ .Message | printf "%q" }},
+        "description": {{ .Message | printf "%q" }},
+        "severity": {{ .Severity | printf "%q" | lower }},
+        "confidence": {{ .Confidence | printf "%q" | lower }},
+        "solution": {{ if .Fix }}{{ .Fix | printf "%q" }}{{ else if .Remediation }}{{ .Remediation | printf "%q" }}{{ else }}"No solution provided"{{ end }},
+        "location": {
+          "file": "{{ $.Target }}",
+          "start_line": {{ .StartLine }},
+          "end_line": {{ .EndLine }}
+        },
+        "identifiers": [
+          {{- range .CWE }}
+            {
+              "type": "cwe",
+              "name": "{{ . }}",
+              "value": "{{ . }}",
+              "url": "https://cwe.mitre.org/data/definitions/{{ . }}.html"
+            }{{ if not (eq (add (index $.CWE) 1) (len $.CWE)) }},{{ end }}
+          {{- end }}
+        ],
+        "scanner": {
+          "id": "trivy",
+          "name": "Trivy"
+        },
+        "links": [
+          {{- range .References }}
+            {
+              "url": {{ . | printf "%q" }}
+            }{{ if not (eq (add (index $.References) 1) (len $.References)) }},{{ end }}
+          {{- end }}
+        ]
+      }
+      {{ $first = false }}
     {{- end }}
   ]
 }
