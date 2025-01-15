@@ -2,7 +2,7 @@
   "version": "15.0.7",
   "vulnerabilities": [
     {{- $first := true }}
-    {{- range . }}
+    {{- range .Results }}
       {{- if eq .Class "sast" }}
         {{- range .Sast }}
           {{- if not $first }}
@@ -11,7 +11,7 @@
           {{- $first = false }}
           {
             "id": "{{ .CheckID }}",
-            "category": "sast",
+            "category": {{ .Category | printf "%q" }},
             "name": {{ .Title | printf "%q" }},
             "message": {{ .Message | printf "%q" }},
             "description": {{ .Message | printf "%q" }},
@@ -30,8 +30,8 @@
             "identifiers": [
               {
                 "type": "cwe",
-                "name": "{{ .CWE }}",
-                "value": "{{ .CWE }}",
+                "name": "{{ index (split .CWE ":") 0 }}",
+                "value": "{{ index (split .CWE ":") 0 }}",
                 "url": "https://cwe.mitre.org/data/definitions/{{ index (split .CWE ":") 0 }}.html"
               }
             ],
